@@ -43,7 +43,7 @@ end
 % scripted in : "train_itq_fc7.m"
 disp('3 - ITQ training');
 dims = size(motion_feats);
-bin_size = 12;
+bin_size = 8;
 n_iter = 100;
 temp_motion_feats=reshape(motion_feats,[dims(1)*dims(2)*dims(3) dims(4)]);
 [ mean_fc7,itq_rot_mat,pca_mapping ] = train_itq( bin_size, n_iter, temp_motion_feats );
@@ -101,10 +101,10 @@ for sample_no=1:dims(1)
             img(i,j) = bi2de( reshape(result(i,j,:),[1 bin_size]), 'left-msb');
         end
     end
-    bin_val_map(:,:,sample_no) = img;
-    img = resize_binary_map( src_image, img );
     img = flip(img,1);
     img = flip(img,2);
+    bin_val_map(:,:,sample_no) = img;
+    img = resize_binary_map( src_image, img );
     %img = flip(img,1);
     motion_feats_img(:,:,sample_no) = img;
 end
