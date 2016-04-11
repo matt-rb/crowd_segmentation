@@ -30,7 +30,7 @@ for sample_no=1:size(feat_matrix,3)
     fusion = imresize(fusion,resize_vis);
     for h_idx=1:size(bin_val_map,1)
         for w_idx=1:size(bin_val_map,2)
-            position =  [(w_idx-1)*30*resize_vis (h_idx-1)*30*resize_vis+20];
+            position =  [(w_idx-1)*30*resize_vis (h_idx-1)*32*resize_vis+30];
             fusion = insertText(fusion,position,bin_val_map(h_idx,w_idx,sample_no),'AnchorPoint','LeftBottom');
         end
     end

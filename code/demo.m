@@ -43,7 +43,7 @@ end
 % scripted in : "train_itq_fc7.m"
 disp('3 - ITQ training');
 dims = size(motion_feats);
-bin_size = 8;
+bin_size = 4;
 n_iter = 100;
 temp_motion_feats=reshape(motion_feats,[dims(1)*dims(2)*dims(3) dims(4)]);
 [ mean_fc7,itq_rot_mat,pca_mapping ] = train_itq( bin_size, n_iter, temp_motion_feats );
