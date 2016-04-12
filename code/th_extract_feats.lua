@@ -16,6 +16,7 @@ file_list = scandir(image_dir, '.jpg')
 -- dis_resize = 227
 -- input standard vgg
 dis_resize = 224
+sq=0
 
 -- load net
 net_conv = torch.load(th_model_full_conv_vgg16_fc7)

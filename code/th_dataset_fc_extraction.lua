@@ -9,17 +9,17 @@ require("scripts.lua.common")
 matio = require 'matio'
 
 -- directories setup
-image_dir= '../data/validation_spatial'
-feats_output_dir= '../data/output/sp_val'
+image_dir= '../data/validation_spatial_alex'
+feats_output_dir= '../data/output/sp_val_alex'
 file_list = scandir(image_dir, '.jpg')
 -- input standard alex
 -- dis_resize = 227
 -- input standard vgg
-dis_resize = 1
+dis_resize = 2
 sq=0
 
 -- load net
-net_conv = torch.load(th_model_fcnalex_pascal_fc7)
+net_conv = torch.load(th_model_full_conv_fc7)
 -- disable flips, dropouts and batch normalization
 net_conv:evaluate()
 print ("NET:\n"..model2text(net_conv))
