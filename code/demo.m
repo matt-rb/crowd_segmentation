@@ -7,27 +7,32 @@ save_data = 0;
 % scripted in : "extract_motion_feats.m"
 disp('1 - Load frames features.. ');
 load('../data/input/sec1.mat');
-tracklet_len=5;
-shift_step=1;
-feat_type = 'fc7';
-disp(['2 - Extract motion features : ' feat_type ]);
+options.tracklet_len=10;
+options.shift_step=1;
+options.hex = 1;
+options.bin_size = 8;
+options.feat_type = 'dif_bin';
+disp(['2 - Extract motion features : ' options.feat_type ]);
 %feats = repmat(feats(1:2,:,:,:),100,1,1,1); 
-switch feat_type
+switch options.feat_type
     case 'fc7'
         shift=0;
         motion_feats = feats;
     case 'max'
-        shift=floor(tracklet_len/2);
-        motion_feats = compute_max_feats( feats, shift_step, tracklet_len );
+        shift=floor(options.tracklet_len/2);
+        motion_feats = compute_max_feats( feats, options.shift_step, options.tracklet_len );
     case 'avg'
-        shift=floor(tracklet_len/2);
-        motion_feats = compute_avg_feats( feats, shift_step, tracklet_len );
+        shift=floor(options.tracklet_len/2);
+        motion_feats = compute_avg_feats( feats, options.shift_step, options.tracklet_len );
     case 'dif'
         shift=1;
         motion_feats = compute_dif_feats( feats );
     case 'sum'
-        shift=floor(tracklet_len/2);
-        motion_feats = compute_sum_feats( feats, shift_step, tracklet_len );
+        shift=floor(options.tracklet_len/2);
+        motion_feats = compute_sum_feats( feats, options.shift_step, options.tracklet_len );
+    case 'dif_bin'
+        shift=1;
+        motion_feats = feats;
     otherwise
         disp('NO VALUE')
         shift=0;
@@ -43,10 +48,9 @@ end
 % scripted in : "train_itq_fc7.m"
 disp('3 - ITQ training');
 dims = size(motion_feats);
-bin_size = 4;
-n_iter = 100;
+n_iter = 300;
 temp_motion_feats=reshape(motion_feats,[dims(1)*dims(2)*dims(3) dims(4)]);
-[ mean_fc7,itq_rot_mat,pca_mapping ] = train_itq( bin_size, n_iter, temp_motion_feats );
+[ mean_fc7,itq_rot_mat,pca_mapping ] = train_itq( options.bin_size, n_iter, temp_motion_feats );
 if save_data
     disp(['saving ITQ matrix to: ../data/output/itq_' feat_type '.mat']);
     save(['../data/output/itq_' feat_type '.mat'],'itq_rot_mat','pca_mapping','mean_fc7');
@@ -63,11 +67,11 @@ project_mat = pca_mapping * itq_rot_mat;
 tt = repmat(mean_fc7(1,:),[h_img_size 1]);
 tt2 = repmat(tt,[w_img_size 1]);
 tt2 = reshape(tt2,[w_img_size h_img_size 4096]);
-motion_feats_binary = zeros(dims(1),dims(2),dims(3),bin_size);
+motion_feats_binary = zeros(dims(1),dims(2),dims(3),options.bin_size);
 
 if save_data
     disp(['save ITQ binary features to: ../data/output/sec1_bin' feat_type '.mat']);
-    save(['../data/output/sec1_bin' feat_type '.mat'],'motion_feats_binary');
+    save(['../data/output/sec1_bin_' feat_type '.mat'],'motion_feats_binary');
 end
 
 for idx=1:dims(1)
@@ -81,7 +85,7 @@ end
 %% 4 - Visualize and save heatmap video
 % scripted in : "visualizaion_binary_map.m"
 disp('5 - Visualize heatmaps');
-out_avi = ['../data/output/out_' feat_type '.avi'];
+out_avi = ['../data/output/out_' options.feat_type '.avi'];
 img_folder = '../data/crowd_frm/';
 %shift=0;
 resize_vis=3;
@@ -94,22 +98,23 @@ src_image = imread([img_folder dirlist(1).name]);
 motion_feats_img = zeros(size(src_image,1),size(src_image,2),dims(1));
 bin_val_map = zeros(dims(2), dims(3), dims(1));
 for sample_no=1:dims(1)
-    result = reshape(motion_feats_binary(sample_no,:,:,:),[dims(2) dims(3) bin_size]);
+    result = reshape(motion_feats_binary(sample_no,:,:,:),[dims(2) dims(3) options.bin_size]);
     img = zeros(h_img_size,w_img_size);
     for i=1:h_img_size
         for j=1:w_img_size
-            img(i,j) = bi2de( reshape(result(i,j,:),[1 bin_size]), 'left-msb');
+            img(i,j) = bi2de( reshape(result(i,j,:),[1 options.bin_size]), 'left-msb');
         end
     end
-    img = flip(img,1);
-    img = flip(img,2);
+    %img = flip(img,1);
+    %img = flip(img,2);
     bin_val_map(:,:,sample_no) = img;
     img = resize_binary_map( src_image, img );
     %img = flip(img,1);
     motion_feats_img(:,:,sample_no) = img;
 end
 
-
-visualize_heat_avi( out_avi, img_folder, motion_feats_img, shift, resize_vis,bin_val_map);
+img_folder = '../data/validation_spatial_alex/';
+visualize_heat_avi( out_avi, img_folder, motion_feats_img, shift, resize_vis,bin_val_map,options);
+visualize_heat_parzen_window( out_avi, img_folder, motion_feats_img, shift, resize_vis,bin_val_map,options);
 %heatAVI( img_folder, motion_feats_img, out_avi, shift);
 
