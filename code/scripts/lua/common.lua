@@ -6,7 +6,6 @@
 -- -------------------------------
 
 require 'cudnn'
-require 'inn'
 require 'image'
 require 'torch'
 require("scripts.lua.utils")

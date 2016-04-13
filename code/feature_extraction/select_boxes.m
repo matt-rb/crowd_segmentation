@@ -1,0 +1,18 @@
+function  boxes = select_boxes( img_w, img_h, w , h )
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+
+boxes = zeros(w*h,4);
+w_step = floor(img_w/w);
+h_step = floor(img_h/h);
+
+box_idx=1;
+for i=1:h
+    for j=1:w
+       boxes(box_idx,:)= [(i-1)*h_step+1 (j-1)*w_step+1 i*h_step j*w_step];
+       box_idx= box_idx+1;
+    end
+end
+
+end
+
