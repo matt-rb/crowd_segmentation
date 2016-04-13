@@ -1,5 +1,5 @@
 setenv('LC_ALL','C')
-
+%startup
 % AddPath
 caffe_path = '/home/moin/GitHub/WeaSupObjDet/fast-rcnn/caffe-fast-rcnn/matlab/';
 ss_path = '/home/moin/GitHub/WeaSupObjDet/rcnn/selective_search/';
@@ -39,6 +39,6 @@ for im = 1 : num_image
     boxes=boxes(:,[2 1 4 3]);
     % FC7 Extraction
     fc7 = region2score(image, boxes);
-    save(['/home/moin/GitHub/PAMI16/mat/patch_feats',sprintf('_image_%-3.6d', im),'.mat'],'fc7','-v7.3');
+    save(['../../data/output/feat_moin_nomean/patch_feats',sprintf('_image_%-3.6d', im),'.mat'],'fc7','-v7.3');
 end
 

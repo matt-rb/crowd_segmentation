@@ -9,8 +9,8 @@ require("scripts.lua.common")
 matio = require 'matio'
 
 -- directories setup
-image_dir= '../data/validation_spatial_alex'
-feats_output_dir= '../data/output/sp_val_alex'
+image_dir= '../data/crowd_frm'
+feats_output_dir= '../data/crowd_feats_darellx2'
 file_list = scandir(image_dir, '.jpg')
 -- input standard alex
 -- dis_resize = 227
@@ -19,7 +19,10 @@ dis_resize = 2
 sq=0
 
 -- load net
-net_conv = torch.load(th_model_full_conv_fc7)
+-- darrel
+net_conv = torch.load(th_model_fcnalex_pascal_fc7)
+-- alex
+-- net_conv = torch.load(th_model_full_conv_fc7)
 -- disable flips, dropouts and batch normalization
 net_conv:evaluate()
 print ("NET:\n"..model2text(net_conv))
@@ -32,7 +35,8 @@ for img_idx=1, table.getn(file_list) do
     y_conv = net_conv:forward(img:cuda())
     -- save to mat file
     print(tostring(y_conv:size(1))..'x'..tostring(y_conv:size(2))..'x'..tostring(y_conv:size(3)))
-    output_mat = feats_output_dir..'/'..file_list[img_idx]..'_.mat'
+    output_mat = feats_output_dir..'/'..file_list[img_idx]..'.mat'
+    print('saved to :'..output_mat)
     matio.save(output_mat,y_conv:float())
     collectgarbage()
 end

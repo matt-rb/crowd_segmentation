@@ -84,7 +84,7 @@ window = im(bbox(2):bbox(4), bbox(1):bbox(3), :);
 tmp = imresize(window, [crop_height crop_width], ...
     'bilinear', 'antialiasing', false);
 if ~isempty(image_mean)
-  tmp = tmp - image_mean(pad_h+(1:crop_height), pad_w+(1:crop_width), :);
+  %tmp = tmp - image_mean(pad_h+(1:crop_height), pad_w+(1:crop_width), :);
 end
 %figure(2); window_ = tmp; imagesc((window_-min(window_(:)))/(max(window_(:))-min(window_(:)))); axis image;
 window = zeros(crop_size, crop_size, 3, 'single');
