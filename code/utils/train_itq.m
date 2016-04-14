@@ -3,7 +3,7 @@ function [ mean_data,itq_rot_mat,pca_mapping ] = train_itq( pca_size, n_iter, fe
 %   Detailed explanation goes here
 
     fprintf('Normalize Data...\n');
-    [feats, mean_data] = normalize_features( feats );
+    [feats2, mean_data] = normalize_features( feats );
 
     %----- PCA ---------
     fprintf('Computing Cov PCA...\n');

@@ -1,29 +1,51 @@
-function avg_feats = compute_avg_feats( feats, shift_step, tracklet_len )
+function avg_feats = compute_avg_feats( feats, shift_step, tracklet_len, options )
 %% Extract Avg features dimensionwise.
 %   Input:
 %   - feats: 4D feature maps of fc7 (N x W x H x L)
 %           N : number of frames
-%           W , H : weight and height of each frame in feature map 
+%           W , H : weight and height of each frame in feature map
 %           L : dimention of single feature vector (4096)
 %   - shift_step: shift for overlapp
 %   - tracklet_len = length of tracklets
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dispstat('','init');
-dims= size(feats);
-frms=dims(1);
-n_feats = floor((frms-tracklet_len)/shift_step)+1;
-start=1;
-avg_feats = zeros(n_feats,dims(2),dims(3),dims(4));
-for idx=1:n_feats
-    dispstat(['extract feature ' num2str(idx) '/' num2str(n_feats)]);
-    for h=1:dims(2)
-        for w=1:dims(3)
-           tracklet_feats=feats(start:start+tracklet_len-1,h,w,:);
-           tmp_avg_feats = mean(tracklet_feats,1);
-           avg_feats(idx,h,w,:)=tmp_avg_feats;
-        end
-    end
-    start = start + shift_step;
+if options.cell_based
+    frms = length(feats);
+    dims= size(feats{1});
+else
+    dims= size(feats);
+    frms=dims(1);
 end
-
+n_feats = floor((frms-tracklet_len)/shift_step)+1;
+%% extract motion features
+if options.cell_based
+    start=1;
+    avg_feats = cell(n_feats,1);
+    for idx=1:n_feats
+        dispstat(['extract feature ' num2str(idx) '/' num2str(n_feats)]);
+        %tracklet_feats = zeros(dims(1),dims(2));
+        tracklet_feats = zeros(options.tracklet_len,dims(1),dims(2));
+        for i=1:tracklet_len
+            %tracklet_feats = tracklet_feats + feats{start+i-1};
+            tracklet_feats(i,:,:)=feats{start+i-1};
+        end
+        %avg_feats{idx}=tracklet_feats*(1/tracklet_len);
+        avg_feats{idx}=reshape(mean(tracklet_feats),[dims(1) dims(2)]);
+        start = start + shift_step;
+    end
+else
+    start=1;
+    avg_feats = zeros(n_feats,dims(2),dims(3),dims(4));
+    for idx=1:n_feats
+        dispstat(['extract feature ' num2str(idx) '/' num2str(n_feats)]);
+        for h=1:dims(2)
+            for w=1:dims(3)
+                tracklet_feats=feats(start:start+tracklet_len-1,h,w,:);
+                tmp_avg_feats = mean(tracklet_feats,1);
+                avg_feats(idx,h,w,:)=tmp_avg_feats;
+            end
+        end
+        start = start + shift_step;
+    end
+end
 end

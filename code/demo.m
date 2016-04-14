@@ -9,7 +9,7 @@ disp('1 - Load frames features.. ');
 load('../data/input/sec1.mat');
 options.tracklet_len=10;
 options.shift_step=1;
-options.hex = 1;
+options.hex = 0;
 options.bin_size = 8;
 options.feat_type = 'dif_bin';
 disp(['2 - Extract motion features : ' options.feat_type ]);
@@ -113,8 +113,7 @@ for sample_no=1:dims(1)
     motion_feats_img(:,:,sample_no) = img;
 end
 
-img_folder = '../data/validation_spatial_alex/';
 visualize_heat_avi( out_avi, img_folder, motion_feats_img, shift, resize_vis,bin_val_map,options);
-visualize_heat_parzen_window( out_avi, img_folder, motion_feats_img, shift, resize_vis,bin_val_map,options);
+%visualize_heat_parzen_window( out_avi, img_folder, motion_feats_img, shift, resize_vis,bin_val_map,options);
 %heatAVI( img_folder, motion_feats_img, out_avi, shift);
 

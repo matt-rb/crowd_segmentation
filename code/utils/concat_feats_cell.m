@@ -1,4 +1,3 @@
-
 function [ feats ] = concat_feats_cell( feat_dir,cell_based )
 %% Merge several feat file to unique
 %   input:

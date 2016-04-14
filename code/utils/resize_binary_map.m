@@ -4,8 +4,8 @@ size_img_org = size(src_image);
 size_bin_map = size(bin_map);
 
 
-x_r = round(size_img_org(2)/size_bin_map(2));
-y_r = round(size_img_org(1)/size_bin_map(1));
+x_r = floor(size_img_org(2)/size_bin_map(2));
+y_r = floor(size_img_org(1)/size_bin_map(1));
 
 if length(size_bin_map) == 2
     new_bin_map = zeros(max(size_img_org(1),y_r*size_bin_map(1)),max(size_img_org(2),x_r*size_bin_map(2)));
