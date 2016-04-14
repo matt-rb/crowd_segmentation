@@ -9,8 +9,8 @@ h_step = floor(img_h/h);
 box_idx=1;
 for i=1:h
     for j=1:w
-       boxes(box_idx,:)= [(j-1)*w_step+1 (i-1)*h_step+1 j*w_step i*h_step i j];
-       box_idx= box_idx+1;
+      boxes(box_idx,:)= [(j-1)*w_step+1 (i-1)*h_step+1 j*w_step i*h_step];
+      box_idx= box_idx+1;
     end
 end
 
