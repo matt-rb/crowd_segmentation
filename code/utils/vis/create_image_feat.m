@@ -2,7 +2,7 @@ function [motion_feats_img, bin_val_map] = create_image_feat( motion_feats_binar
 %UNTITLED4 Summary of this function goes here
 %   Detailed explanation goes here
 frame_count= length(motion_feats_binary);
-dirlist = dir([img_folder, '***.jpg']);
+dirlist = dir([img_folder, '***.tif']);
 src_image = imread([img_folder dirlist(1).name]);
 
 motion_feats_img = zeros(size(src_image,1),size(src_image,2),frame_count);

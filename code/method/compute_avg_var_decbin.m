@@ -37,9 +37,14 @@ for sample_no=1:n_feats
     end
     
     % average of sum of distances
-    sum_var = floor(sum_var*(1/options.tracklet_len));
+    sum_var = sum_var*(1/options.tracklet_len);
     sum_var(find(sum_var<options.th))=0;
-    tmp_m_feats{sample_no} = de2bi(sum_var, options.bin_size, 'left-msb');
+    if options.binary_based
+        sum_var = floor(sum_var);
+        tmp_m_feats{sample_no} = de2bi(sum_var, options.bin_size, 'left-msb');
+    else
+        tmp_m_feats{sample_no} = sum_var;
+    end
     start = start + options.shift_step;
 end
 feats_binary = tmp_m_feats;

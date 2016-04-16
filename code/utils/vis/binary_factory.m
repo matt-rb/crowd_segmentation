@@ -6,7 +6,7 @@ function [ project_mat , mean_fc7 ] = binary_factory( motion_feats , boxes, opti
 % scripted in : "train_itq_fc7.m"
 disp('3 - ITQ training');
 n_iter = 300;
-temp_motion_feats = zeros(length(motion_feats)*length(boxes), 4096);
+temp_motion_feats = zeros(length(motion_feats)*length(boxes), size(motion_feats{1},2));
 for feat_idx=1:length(motion_feats)
     temp_motion_feats((feat_idx-1)*length(boxes)+1:feat_idx*length(boxes),:)=motion_feats{feat_idx};
 end

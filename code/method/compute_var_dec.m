@@ -41,7 +41,7 @@ for sample_no=1:n_feats
             var_patchs(patch_idx) = var(tracklet_feats(:,patch_idx));
         end
     end
-    var_patchs(find(sum_var<options.th))=0;
+    var_patchs(find(var_patchs<options.th))=0;
     tmp_m_feats{sample_no} = var_patchs;
     start = start + options.shift_step;
 end

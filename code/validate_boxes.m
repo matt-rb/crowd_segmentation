@@ -2,8 +2,8 @@ clc
 clear
 startup;
 
-load('boxes.mat');
-img_name = '../data/crowd_frm/001.jpg';
+load('boxes_ped2.mat');
+img_name = '../data/crowd_frm_test002/001.tif';
 img= imread(img_name);
 for i=1:length(boxes)
     tmp = img;

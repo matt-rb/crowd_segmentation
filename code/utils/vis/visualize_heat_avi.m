@@ -4,7 +4,7 @@ function visualize_heat_avi( out_avi, img_folder, feat_matrix , bin_val_map,opti
 %   input:
 %       - out_avi : output file address
 %       - img_folder : folder contains .jpg frames
-%       - feat_matrix : 3D matrix [X Y N], where [X Y] are heat matrix for 
+%       - feat_matrix : 3D matrix [X Y N], where [X Y] are heat matrix for
 %                       each frame, and N is totall number of heat maps.
 %       - shift : to adjust beginig frame.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -12,7 +12,7 @@ function visualize_heat_avi( out_avi, img_folder, feat_matrix , bin_val_map,opti
 %% read frame folder and initialize video writer object
 dispstat('','init');
 dispstat('Creating video file...','keepthis');
-dirlist = dir([img_folder, '***.jpg']);
+dirlist = dir([img_folder, '***.tif']);
 aviobj1 = VideoWriter(out_avi);
 aviobj1.FrameRate = 15;
 open(aviobj1);
@@ -23,7 +23,11 @@ for sample_no=1:size(feat_matrix,3)
     img_background= feat_matrix(:,:,sample_no);
     img_org_name = [img_folder dirlist(sample_no+options.shift).name];
     org_img= imread(img_org_name);
-    fusion = imfuse(img_background,org_img,'Scaling','independent','ColorChannels',[1 2 2]);
+    % Moin touch
+    max_val=max(img_background(:));
+    img_background = img_background .* (1/max_val);
+    fusion = imfuse(img_background,org_img,'Scaling','none', 'ColorChannels',[1 2 2]);
+    %fusion = imfuse(img_background,org_img,'Scaling','independent','ColorChannels',[1 2 2]);
     h_th = floor(size(feat_matrix,1)/size(bin_val_map,1));
     w_th = floor(size(feat_matrix,2)/size(bin_val_map,2));
     fusion = imresize(fusion,options.resize_vis);
@@ -33,7 +37,13 @@ for sample_no=1:size(feat_matrix,3)
             fusion = insertText(fusion,position,bin_val_map(h_idx,w_idx,sample_no),'AnchorPoint','LeftBottom');
         end
     end
-    %imwrite(fusion,['../data/output/frms/' dirlist(sample_no+options.shift).name]);
+    if options.save_frames
+        save_dir = ['../data/output/frms/' options.name_ext ];
+        if ~exist(save_dir,'dir')
+            mkdir(save_dir);
+        end
+        imwrite(fusion,[save_dir '/' dirlist(sample_no+options.shift).name]);
+    end
     writeVideo(aviobj1,fusion);
 end
 close(aviobj1);
