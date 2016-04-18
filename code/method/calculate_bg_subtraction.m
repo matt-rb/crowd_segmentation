@@ -20,7 +20,7 @@ else
         for sample_idx=1:length(motion_feats_binary)
             bin_binary_value=motion_feats_binary{sample_idx}(bin_idx,:);
             cluster_code =bi2de( bin_binary_value, 'left-msb')+1;
-            sample_bin_cluster_centers(sample_idx) = cluster_centers(cluster_code,:);
+            sample_bin_cluster_centers(sample_idx,:) = cluster_centers(cluster_code,:);
         end
         w_bg_mask(boxes(bin_idx,5),boxes(bin_idx,6))= norm(var(sample_bin_cluster_centers));
     end

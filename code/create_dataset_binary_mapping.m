@@ -9,6 +9,7 @@ options.W_measure_type = 'euc';
 % 'euc' cluster centers distance variance
 % 'dec' decimal values variance
 options.bg_mask_type = 'euc';
+
 feat_dir = '../data/output/ucsd_conv5/UCSDped2/all';
 out_file_mapping = 'variables/itq_8_fc5_ped2.mat';
 out_file_bg_mask = 'variables/bg_mask_ped2.mat';
