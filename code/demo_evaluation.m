@@ -11,7 +11,7 @@ load(options.segments_file);
 
 %my options
 options.shift=ceil(options.tracklet_len/2);
-options.th_roc=500;
+options.th_roc=0;
 
 options.itrnum = 21;
 options.ClipOfFrame = options.shift;
@@ -26,6 +26,7 @@ result = SegmentResultMatrix(all_CoAp,TestVideoFile_new,ImgGrandtruth,options);
 TP1 = TruePositiveValue(result,all_CoAp,options);
 [TPR,FPR,Roc1] = ROCValue(TP1,all_CoAp,options);
 
+close all
 disp('Plot ROC');
 plot(Roc1(:,2),Roc1(:,1),'-*')
 grid on

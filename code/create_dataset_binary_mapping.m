@@ -6,8 +6,8 @@ options.h=5;
 options.bin_size = 8;
 options.W_measure_type = 'euc';
 feat_dir = '../data/output/ucsd_conv5/UCSDped2/all';
-out_file_mapping = 'itq_8_fc5_ped1.mat';
-out_file_w = 'W_8bit_ped1.mat';
+out_file_mapping = 'itq_8_fc5_ped2.mat';
+out_file_w = 'W_8bit_ped2.mat';
 load ('boxes_ped2.mat');
 video_list = dir([feat_dir '/T*']);
 all_feats= {};
@@ -26,6 +26,7 @@ end
 % 3 - Convert fc7 motion feature maps to binary feature maps
 motion_feats_binary = project_feat2bin( all_feats, project_mat, mean_fc7);
 w_matrix = calculate_w_matrix(motion_feats_binary , all_feats , options);
+w_bs_mask= calculate_bg_subtraction(motion_feats_binary , boxes , options);
 
 save(out_file_w,'w_matrix');
 save(out_file_mapping,'project_mat','mean_fc7');

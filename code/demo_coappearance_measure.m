@@ -16,7 +16,7 @@ options.hex = 0;
 options.bin_size = 8;%8;
 options.tracklet_len= 17;
 options.feat_type = 'coa_m';
-options.th = 0.4;
+options.th = 0;
 % W_measure_type = 'euc' , 'ham' , 'dec'
 options.W_measure_type = 'euc';
 
@@ -57,6 +57,7 @@ load('itq_8_conv5_ped2');
 % 3 - Convert fc7 motion feature maps to binary feature maps
 motion_feats_binary = project_feat2bin( motion_feats, project_mat, mean_fc7);
 %w_matrix = calculate_w_matrix(motion_feats_binary , motion_feats , options);
+w_bs_mask = calculate_bg_subtraction(motion_feats_binary , boxes, options );
 
 motion_feats_binary = compute_coappearance_measure( motion_feats_binary , w_matrix, options);
 
