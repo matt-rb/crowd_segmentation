@@ -38,7 +38,7 @@ for im = 1 : num_image
         image = im_tmp;
     end
     [h_,w_,c_]= size(image);
-    boxes = select_boxes( w_, h_, 8 , 5 );
+    boxes = select_boxes( w_, h_, 8 , 5 ,4);
     %boxes=boxes(:,[2 1 4 3]);
     % FC7 Extraction
     fc7 = region2score(image, boxes);
