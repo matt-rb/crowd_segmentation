@@ -6,17 +6,18 @@ options.h=5;
 options.bin_size = 8;
 options.W_measure_type = 'euc';
 feat_dir = '../data/output/ucsd_conv5/UCSDped2/all';
-out_file_mapping = 'itq_8_fc5_ped2.mat';
-out_file_bg_mask = 'bg_mask_ped2.mat';
-out_file_w = 'W_8bit_ped2.mat';
-load ('boxes_ped2.mat');
+out_file_mapping = 'variables/itq_8_fc5_ped2.mat';
+out_file_bg_mask = 'variables/bg_mask_ped2.mat';
+out_file_w = 'variables/W_conv5_8bit_ped2.mat';
+load ('variables/boxes_ped2.mat');
 video_list = dir([feat_dir '/T*']);
 all_feats= {};
 all_feat_idx=1;
 for vid_idx=1:length(video_list)
     feat_list = dir([feat_dir '/' video_list(vid_idx).name '/*.mat']);
     for i=1:size(feat_list,1)
-       dispstat(['Reading ' num2str(i) '/' num2str(size(feat_list,1))]);
+       dispstat(['Reading video ' num2str(vid_idx) '/' num2str(length(video_list))...
+           ' frame ' num2str(i) '/' num2str(size(feat_list,1))]);
        load([ feat_dir '/' video_list(vid_idx).name '/' feat_list(i).name])
        all_feats{all_feat_idx} = fc7;
        all_feat_idx = all_feat_idx+1;
