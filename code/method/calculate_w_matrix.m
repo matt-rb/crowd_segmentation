@@ -1,4 +1,4 @@
-function w_matrix = calculate_w_matrix(motion_feats_binary , motion_feats, options )
+function [w_matrix, cluster_centers]= calculate_w_matrix(motion_feats_binary , motion_feats, options )
 % Calculate weight matrix W for all binary bins
 %
 

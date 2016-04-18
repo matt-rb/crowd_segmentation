@@ -1,4 +1,4 @@
-function feats_binary = compute_coappearance_measure( feats_binary, w_matrix, options )
+function feats_binary = compute_coappearance_measure( feats_binary, w_matrix,w_bg_mask, boxes, options )
 %% Compute coappearance measure in tracklet, over decimal value of fc7.
 %   lets:
 %       dec = Decimal ( Binary(fc7) )
@@ -36,7 +36,7 @@ for sample_no=1:n_feats
         patch = tracklet_feats(:,patch_idx);
         global_hist = tracklet_hist(patch);
         irr = compute_irregularity(global_hist, w_matrix);
-        measure_patchs(patch_idx) = irr;
+        measure_patchs(patch_idx) = irr * w_bg_mask(boxes(patch_idx,5),boxes(patch_idx,6));
     end
     %measure_patchs(find(measure_patchs<options.th))=0;
     

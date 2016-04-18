@@ -33,7 +33,9 @@ load('bg_mask_ped2.mat');
 feat_dir = '../data/ucsd_conv5/UCSDped2/Test';
 img_folder = '../data/ucsd/UCSDped2/Test/Test001/';
 options.gt_folder='../data/ucsd/UCSDped2/gt/';
-options.segments_file=['../data/output/motion_feats_conv5_th_' num2str(options.th) '_bs_ped2.mat'];
+options.segments_file=['../data/output/motion_feats_conv5_th_' num2str(options.th) '_bsof_ped2.mat'];
+of_feats='../data/output/motion_feats_OF_ped2.mat';
+load(of_feats,'all_OF');
 pres_rescore = ones(5,8);
 
 disp(options);
@@ -49,6 +51,7 @@ w_bg_mask = w_bg_mask .* (1/max(w_bg_mask(:)));
 w_bg_mask = w_bg_mask>0.02;
 
 for video_sample_idx=1:length(feat_dirlist)
+optical_flows = all_OF{video_sample_idx};
 
 dispstat(['compute sample: ' num2str(video_sample_idx) '/' num2str(length(feat_dirlist))]);
 sample_dir = [feat_dir '/' feat_dirlist(video_sample_idx).name];
@@ -59,6 +62,10 @@ motion_feats = feats;
 motion_feats_binary = project_feat2bin( motion_feats, project_mat, mean_fc7);
 motion_feats_binary = compute_coappearance_measure( motion_feats_binary , w_matrix,w_bg_mask, boxes, options);
 [motion_feats_img, bin_val_map] = create_image_feat( motion_feats_binary, boxes, img_folder, pres_rescore, options);
+
+for im_idx=1:size(motion_feats_img,3)
+    motion_feats_img(:,:,im_idx) = motion_feats_img(:,:,im_idx) .* all_OF{video_sample_idx,im_idx+options.shift};
+end
 
 max_val=max(motion_feats_img(:));
 motion_feats_img = motion_feats_img .* (1/max_val);

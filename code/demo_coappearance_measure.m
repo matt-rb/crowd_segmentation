@@ -21,14 +21,16 @@ options.th = 0;
 options.W_measure_type = 'euc';
 
 % set dataset and feats
-load('boxes_ped2.mat');
-load('W_conv5_8bit_ped2');
-load('itq_8_conv5_ped2');
+load('variables/boxes_ped2.mat');
+load('variables/W_conv5_8bit_ped2');
+load('variables/itq_8_conv5_ped2');
+load('variables/bg_mask_ped2.mat');
 
 feat_dir = '../data/ucsd_conv5/UCSDped2/Test/Test002';
 img_folder = '../data/ucsd/UCSDped2/Test/Test002/';
 options.gt_folder='../data/ucsd/UCSDped2/gt/Test002_gt/';
 options.segments_file='../data/output/motion_feats_conv5_ped2.mat';
+options.optical_flow='../data/output/motion_feats_conv5_ped2.mat';
 
 feats = merge_feats(feat_dir);
 %tracklet_size =  [5 11 15 17 21];
@@ -38,7 +40,7 @@ feats = merge_feats(feat_dir);
 % directories configuration
 options.name_ext = [options.feat_type '_' num2str(options.bin_size) ...
     'bit_trk_' num2str(options.tracklet_len) '_th_' num2str(options.th) '_W' options.W_measure_type];
-out_avi = ['../data/output/vis/' options.name_ext '.avi'];
+out_avi = ['../data/output/vis/' options.name_ext '_bs.avi'];
 out_hist_dir = ['../data/output/hist/' options.name_ext];
 diary(['../data/output/log/' options.name_ext '_' datestr(datetime('now')) '.txt']);
 
@@ -53,13 +55,15 @@ options.shift=ceil(options.tracklet_len/2);
 motion_feats = feats;
 % 2 - ITQ training over features
 %[ project_mat , mean_fc7 ] = binary_factory( motion_feats , boxes, options);
-load('itq_8_conv5_ped2');
+
 % 3 - Convert fc7 motion feature maps to binary feature maps
 motion_feats_binary = project_feat2bin( motion_feats, project_mat, mean_fc7);
 %w_matrix = calculate_w_matrix(motion_feats_binary , motion_feats , options);
-w_bs_mask = calculate_bg_subtraction(motion_feats_binary , boxes, options );
+%w_bs_mask = calculate_bg_subtraction(motion_feats_binary , boxes, options );
 
-motion_feats_binary = compute_coappearance_measure( motion_feats_binary , w_matrix, options);
+w_bg_mask = w_bg_mask .* (1/max(w_bg_mask(:)));
+%w_bg_mask = w_bg_mask>0.02;
+motion_feats_binary = compute_coappearance_measure( motion_feats_binary , w_matrix, w_bg_mask, boxes, options);
 
 disp(['Features "' options.feat_type '" are extracted under : ']);
 disp(options);
