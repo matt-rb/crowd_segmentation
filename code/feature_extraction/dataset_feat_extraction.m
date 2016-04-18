@@ -12,12 +12,23 @@ addpath(genpath(ss_path));
 
 % Net init
 n = 'model/bvlc_reference_caffenet.caffemodel';
-d = 'model/imagenet_layer7.prototxt';
+d = 'model/imagenet_layer5.prototxt';
 caffe('init', d, n, 'test')
 caffe('set_mode_gpu');
 
-dataset_root = '../../data/ucsd/UCSDped2/Test/';
-save_feats_root = '../../data/output/ucsd_fc7/UCSDped2/Test/';
+feat_type='ucsd_conv5_6x4';
+
+dataset_roots={'../../data/ucsd/UCSDped1/Train/', '../../data/ucsd/UCSDped1/Test/', ...
+    '../../data/ucsd/UCSDped2/Train/', '../../data/ucsd/UCSDped2/Test/'};
+save_feats_roots={['../../data/output/' feat_type '/UCSDped1/Train/'],...
+    ['../../data/output/' feat_type '/UCSDped1/Test/'],...
+    ['../../data/output/' feat_type '/UCSDped2/Train/'],...
+    ['../../data/output/' feat_type '/UCSDped2/Test/']};
+
+for dt_idx=2:2%length(dataset_roots)
+    
+dataset_root = dataset_roots{dt_idx};
+save_feats_root = save_feats_roots{dt_idx};
 
 video_names = dir([dataset_root 'T*']);
 num_videos = length(video_names);
@@ -47,12 +58,13 @@ for im = 1 : num_image
         image = im_tmp;
     end
     [h_,w_,c_]= size(image);
-    boxes = select_boxes( w_, h_, 8 , 5 , 4);
+    boxes = select_boxes( w_, h_, 6 , 4 , 4);
     %boxes=boxes(:,[2 1 4 3]);
     % FC7 Extraction
     fc7 = region2score(image, boxes);
     %save([save_feats_root video_names(video_idx).name '/patch_feats',sprintf('_image_%-3.6d', im),'.mat'],'fc7','-v7.3');
     save([video_feat_path_folder '/patch_feats_',sprintf('_image_%-3.6d', im),'.mat'],'fc7','-v7.3');
     %disp(['saved to :' video_feat_path_folder '/patch_feats_',sprintf('_image_%-3.6d', im),'.mat']);
+end
 end
 end
