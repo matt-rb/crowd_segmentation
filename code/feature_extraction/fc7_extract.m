@@ -1,3 +1,5 @@
+
+clear all
 setenv('LC_ALL','C')
 %startup
 % AddPath
@@ -8,14 +10,14 @@ addpath(genpath(ss_path));
 
 
 % Net init
-n = '/home/moin/GitHub/fast-rcnn/caffe-fast-rcnn/matlab/caffe/moin/bvlc_reference_caffenet.caffemodel';
-d = '/home/moin/GitHub/fast-rcnn/caffe-fast-rcnn/matlab/caffe/moin/imagenet_layer7.prototxt';
+n = 'model/bvlc_reference_caffenet.caffemodel';
+d = 'model/imagenet_layer6.prototxt';
 caffe('init', d, n, 'test')
 caffe('set_mode_gpu');
 
 % Data
-dataset_path = '../../data/crowd_frm';
-img_names = dir([dataset_path '/*.jpg']);
+dataset_path = '../../data/Test001';
+img_names = dir([dataset_path '/*.tif']);
 %[~,img_names] = textread([dataset_path,'/','images.txt'],'%d %s');
 %[~,x,y,w,h] = textread([dataset_path,'/','bounding_boxes.txt'],'%d %f %f %f %f');
 %bb_gt_all = [x,y,w+x-1,h+y-1]; % conver to [x1,y1,x2,y2]
@@ -35,10 +37,11 @@ for im = 1 : num_image
         clear image;
         image = im_tmp;
     end
-    boxes = select_boxes( 238, 158, 8 , 5 );
-    boxes=boxes(:,[2 1 4 3]);
+    [h_,w_,c_]= size(image);
+    boxes = select_boxes( w_, h_, 8 , 5 );
+    %boxes=boxes(:,[2 1 4 3]);
     % FC7 Extraction
     fc7 = region2score(image, boxes);
-    save(['../../data/output/feat_moin_nomean/patch_feats',sprintf('_image_%-3.6d', im),'.mat'],'fc7','-v7.3');
+    save(['../../data/output/feat_fc6_nomean_test001/patch_feats',sprintf('_image_%-3.6d', im),'.mat'],'fc7','-v7.3');
 end
 
