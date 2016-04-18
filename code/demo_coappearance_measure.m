@@ -14,18 +14,23 @@ options.h=5;
 options.shift_step=1;
 options.hex = 0;
 options.bin_size = 8;%8;
-options.tracklet_len= 15;
+options.tracklet_len= 17;
 options.feat_type = 'coa_m';
-options.th = 0;
+options.th = 0.4;
 % W_measure_type = 'euc' , 'ham' , 'dec'
 options.W_measure_type = 'euc';
 
 % set dataset and feats
 load('boxes_ped2.mat');
-feat_dir = '../data/output/feat_fc5_nomean_test002';
-img_folder = '../data/crowd_frm_test002/';
-feats = merge_feats(feat_dir);
+load('W_conv5_8bit_ped2');
+load('itq_8_conv5_ped2');
 
+feat_dir = '../data/ucsd_conv5/UCSDped2/Test/Test002';
+img_folder = '../data/ucsd/UCSDped2/Test/Test002/';
+options.gt_folder='../data/ucsd/UCSDped2/gt/Test002_gt/';
+options.segments_file='../data/output/motion_feats_conv5_ped2.mat';
+
+feats = merge_feats(feat_dir);
 %tracklet_size =  [5 11 15 17 21];
 %for trk_idx=1:length(tracklet_size)
 %options.tracklet_len=tracklet_size(trk_idx);
@@ -47,10 +52,12 @@ options.shift=ceil(options.tracklet_len/2);
 
 motion_feats = feats;
 % 2 - ITQ training over features
-[ project_mat , mean_fc7 ] = binary_factory( motion_feats , boxes, options);
+%[ project_mat , mean_fc7 ] = binary_factory( motion_feats , boxes, options);
+load('itq_8_conv5_ped2');
 % 3 - Convert fc7 motion feature maps to binary feature maps
 motion_feats_binary = project_feat2bin( motion_feats, project_mat, mean_fc7);
-w_matrix = calculate_w_matrix(motion_feats_binary , motion_feats , options);
+%w_matrix = calculate_w_matrix(motion_feats_binary , motion_feats , options);
+
 motion_feats_binary = compute_coappearance_measure( motion_feats_binary , w_matrix, options);
 
 disp(['Features "' options.feat_type '" are extracted under : ']);

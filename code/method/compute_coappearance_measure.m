@@ -38,11 +38,20 @@ for sample_no=1:n_feats
         irr = compute_irregularity(global_hist, w_matrix);
         measure_patchs(patch_idx) = irr;
     end
-    measure_patchs(find(measure_patchs<options.th))=0;
+    %measure_patchs(find(measure_patchs<options.th))=0;
+    
     tmp_m_feats{sample_no} = measure_patchs;
     start = start + options.shift_step;
 end
+max_val=max(max(cellfun(@(x) max(x(:)),tmp_m_feats(:))));
+%tmp_m_feats = tmp_m_feats .* (1/max_val);
+tmp_m_feats = cellfun(@(x) x(:).* (1/max_val),tmp_m_feats(:),'UniformOutput',false);
 feats_binary = tmp_m_feats;
+for feat_idx=1:length(feats_binary)
+    tmp_feat = feats_binary{feat_idx};
+    tmp_feat(tmp_feat(:)<options.th)=0;
+    feats_binary{feat_idx} = tmp_feat;
+end
 end
 
 function irr = compute_irregularity(hist_vector, w_matrix)

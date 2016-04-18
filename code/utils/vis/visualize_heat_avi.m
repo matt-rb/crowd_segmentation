@@ -13,6 +13,7 @@ function visualize_heat_avi( out_avi, img_folder, feat_matrix , bin_val_map,opti
 dispstat('','init');
 dispstat('Creating video file...','keepthis');
 dirlist = dir([img_folder, '***.tif']);
+dirlist_gt = dir([options.gt_folder, '***.bmp']);
 aviobj1 = VideoWriter(out_avi);
 aviobj1.FrameRate = 15;
 open(aviobj1);
@@ -22,11 +23,14 @@ for sample_no=1:size(feat_matrix,3)
     dispstat(['writing frame ' num2str(sample_no) '/' num2str(size(feat_matrix,3)) ]);
     img_background= feat_matrix(:,:,sample_no);
     img_org_name = [img_folder dirlist(sample_no+options.shift).name];
+    img_gt_name = [options.gt_folder dirlist_gt(sample_no+options.shift).name];
+    img_gt=imread(img_gt_name);
     org_img= imread(img_org_name);
     % Moin touch
     max_val=max(img_background(:));
     img_background = img_background .* (1/max_val);
     fusion = imfuse(img_background,org_img,'Scaling','none', 'ColorChannels',[1 2 2]);
+    %fusion = imfuse(fusion,img_gt, 'ColorChannels',[1 1 2]);
     %fusion = imfuse(img_background,org_img,'Scaling','independent','ColorChannels',[1 2 2]);
     h_th = floor(size(feat_matrix,1)/size(bin_val_map,1));
     w_th = floor(size(feat_matrix,2)/size(bin_val_map,2));
