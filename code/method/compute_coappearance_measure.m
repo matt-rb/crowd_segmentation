@@ -1,4 +1,4 @@
-function feats_binary = compute_coappearance_measure( feats_binary, w_matrix,w_bg_mask, boxes, options )
+function feats_binary = compute_coappearance_measure( feats_binary, optical_flow, w_matrix,w_bg_mask, boxes, options )
 %% Compute coappearance measure in tracklet, over decimal value of fc7.
 %   lets:
 %       dec = Decimal ( Binary(fc7) )
@@ -22,13 +22,17 @@ frms = length(feats_binary);
 dims= size(feats_binary{1});
 n_feats = floor((frms-options.tracklet_len)/options.shift_step)+1;
 tmp_m_feats=cell(n_feats,1);
+of_feats_count= sum((~cellfun(@isempty,optical_flow)));
 start=1;
 
+
 for sample_no=1:n_feats
-    dispstat(['extract feature ' num2str(sample_no) '/' num2str(n_feats)]);
+    dispstat(['extract feature ' num2str(sample_no) '/' num2str(n_feats) '--' num2str(start)]);
     tracklet_feats = zeros(options.tracklet_len,dims(1));
+    of_feats=zeros(options.h,options.w,options.tracklet_len-2);
     for i=1:options.tracklet_len
         tracklet_feats(i,:)=bi2de( feats_binary{start+i-1}, 'left-msb');
+        %of_feats(:,:,i)=optical_flow{min(start+i-1,of_feats_count)};
     end
     
     measure_patchs = zeros(dims(1),1);
@@ -37,39 +41,81 @@ for sample_no=1:n_feats
         global_hist = tracklet_hist(patch);
         irr = compute_irregularity(global_hist, w_matrix);
         measure_patchs(patch_idx) = irr * w_bg_mask(boxes(patch_idx,5),boxes(patch_idx,6));
+        
+        %% OF fusion
+        %of_value=mean(of_feats(boxes(patch_idx,5),boxes(patch_idx,6),:));
+        %measure_patchs(patch_idx) = measure_patchs(patch_idx)*of_value;
+        
     end
-    %measure_patchs(find(measure_patchs<options.th))=0;
-    
     tmp_m_feats{sample_no} = measure_patchs;
     start = start + options.shift_step;
 end
+
+%% Max normalization
 max_val=max(max(cellfun(@(x) max(x(:)),tmp_m_feats(:))));
-%tmp_m_feats = tmp_m_feats .* (1/max_val);
 tmp_m_feats = cellfun(@(x) x(:).* (1/max_val),tmp_m_feats(:),'UniformOutput',false);
 feats_binary = tmp_m_feats;
 for feat_idx=1:length(feats_binary)
     tmp_feat = feats_binary{feat_idx};
-    tmp_feat(tmp_feat(:)<options.th)=0;
+    %% fusion with optical flow
+    if (options.fusion_with_OF)
+        of_feats=optical_flow{feat_idx+options.shift-1};
+        for patch_idx=1:length(tmp_feat)
+            %of_value=abs(of_feats(boxes(patch_idx,5),boxes(patch_idx,6),1)-...
+            %of_feats(boxes(patch_idx,5),boxes(patch_idx,6),end));
+            of_value=of_feats(boxes(patch_idx,5),boxes(patch_idx,6))/2;
+            tmp_feat(patch_idx) = (tmp_feat(patch_idx)/2)+of_value;
+            %tmp_feat(patch_idx) = of_value;
+        end
+        %measure_patchs(patch_idx) = of_value;
+    end
+    %%
+    
+    
+    %if (norm(tmp_feat)<0.75)
+    %if (sum(tmp_feat)<2.5)
+    %    tmp_feat((tmp_feat>0))=0;
+    %end
+    
+    %% one VS rest
+    for bin_idx=1:length(tmp_feat)
+        rest = tmp_feat;
+        if (tmp_feat(bin_idx)>0)
+            rest(bin_idx)=[];
+            tmp_feat(bin_idx) = abs(tmp_feat(bin_idx) - mean(rest));
+        end
+    end
+    %% -----------------------
+    
+    tmp_feat(tmp_feat(:)<=options.th)=0;
     feats_binary{feat_idx} = tmp_feat;
 end
 end
 
 function irr = compute_irregularity(hist_vector, w_matrix)
-    dominant = find(hist_vector(2,:)==max(hist_vector(2,:)),1);
-    irr=0;
-    for i=1:size(hist_vector,2)
-        W = w_matrix(hist_vector(1,i)+1,hist_vector(1,dominant)+1);
-        irr = irr + W * sqrt((hist_vector(2,dominant) - hist_vector(2,i))^2);
-    end
+dominant = find(hist_vector(2,:)==max(hist_vector(2,:)),1);
+irr=0;
+for i=1:size(hist_vector,2)
+    W = w_matrix(hist_vector(1,i)+1,hist_vector(1,dominant)+1);
+    %original
+    irr = irr + W * sqrt((hist_vector(2,dominant) - hist_vector(2,i))^2);
+    
+    % x
+    %irr = irr + sqrt((hist_vector(2,dominant) - hist_vector(2,i))^2);
+    
+    % W x Wham
+    %W_ham = w_matrix_ham(hist_vector(1,i)+1,hist_vector(1,dominant)+1);
+    %irr = irr + W*W_ham;
+end
 end
 
 
 function hist_vector = tracklet_hist(tracklet)
-    bins = unique(tracklet);
-    hist_vector = zeros(2,length(bins));
-    hist_vector(1,:) = bins;
-    for hist_idx=1:length(bins)
-        hist_vector(2,hist_idx) = sum(tracklet==bins(hist_idx));
-    end
+bins = unique(tracklet);
+hist_vector = zeros(2,length(bins));
+hist_vector(1,:) = bins;
+for hist_idx=1:length(bins)
+    hist_vector(2,hist_idx) = sum(tracklet==bins(hist_idx));
+end
 end
 

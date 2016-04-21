@@ -23,8 +23,12 @@ for jj=1:options.itrnum
              sumsample = sumsample +1;            
         end
     end
+        
     TPR = TP/positive;
-    FPR = FP/negative; 
+    FPR = FP/negative;
+    if (negative==0)
+       FPR =0;
+    end
     Roc1(jj,1) = TPR ;
     Roc1(jj,2) = FPR ;
 
