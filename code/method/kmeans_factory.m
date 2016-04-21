@@ -1,4 +1,4 @@
-function [ C , A ] = kmeans_factory( motion_feats , boxes, options)
+function [ C , A , mean_data] = kmeans_factory( motion_feats , boxes, options)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -9,7 +9,7 @@ temp_motion_feats = zeros(length(motion_feats)*length(boxes), size(motion_feats{
 for feat_idx=1:length(motion_feats)
     temp_motion_feats((feat_idx-1)*length(boxes)+1:feat_idx*length(boxes),:)=motion_feats{feat_idx};
 end
-
+[temp_motion_feats, mean_data] = normalize_features( temp_motion_feats );
 [C,A] = vl_kmeans(temp_motion_feats',options.no_clusters,'distance','l2','algorithm','ann');
 %[idx,C] = kmeans(temp_motion_feats,options.no_clusters,'MaxIter',100,'Display','final','Replicates',5);
 end
