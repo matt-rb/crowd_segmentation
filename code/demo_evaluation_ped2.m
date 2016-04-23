@@ -5,8 +5,8 @@ UCSDped2;
 
 %load data files
 disp('1 - Load data');
-feat_type='of_ovrs';
-options.segments_file=['../data/output/feats_conv5_th_0.3_' feat_type '.mat'];
+feat_type='wxovrsof_1t2';
+options.segments_file=['../data/output/clusters_th_0.15_' feat_type '.mat'];
 load(options.segments_file);
 %options = options_extracted_feats;
 options.gt_folder='../data/ucsd/UCSDped2/gt/';
@@ -14,11 +14,12 @@ options.gt_folder='../data/ucsd/UCSDped2/gt/';
 
 %my options
 options.shift=ceil(options.tracklet_len/2);
-options.th_roc=0;
+options.th_roc=2500;
 
+all=1;
 options.itrnum = 20;
 options.ClipOfFrame = options.shift;
-options.threshold_pixellevel = 0.39;
+options.threshold_pixellevel = 0.38;
 
 
 disp('2 - Create grand-truth annotation');
@@ -27,9 +28,19 @@ load('variables/gt_ped2.mat','ImgGrandtruth','TestVideoFile_new');
 
 RoCs=cell(12,1);
 
-for i=1:1
+if all
+    idx_end=1;
+else
+    idx_end=12;
+end
+
+for i=1:idx_end
 start=i;
-end_vid=i+10;
+if all
+    end_vid=12;
+else
+   end_vid = start;
+end
 disp(['Evaluation results ' num2str(i)]);
 result = SegmentResultMatrix(all_CoAp(start:end_vid,:),TestVideoFile_new(start:end_vid),ImgGrandtruth(start:end_vid,:),options);
 TP1 = TruePositiveValue(result,all_CoAp(start:end_vid,:),options);
@@ -43,12 +54,23 @@ plot([0 1] ,[1 0],'red')
 grid on
 xlabel('FPR'); ylabel('TPR')
 title(['ROC for classification/ ' strrep(options.segments_file(29:end-4), '_', ' ')])
-file_name=['eval_results/new/' sprintf('%.3d', i) '_' feat_type '_all.png'];
-%print(file_name,'-dpng');
+
+if all
+    file_name=['eval_results/all_' feat_type '.png'];
+else
+    file_name=['eval_results/cluster_based/' feat_type '_' sprintf('%.3d', i) '.png'];
+end
+
+print(file_name,'-dpng');
 RoCs{i}=Roc1;
 %close all
-w = waitforbuttonpress;
+%w = waitforbuttonpress;
 end
-%save(['evaluation_set/RoC_' feat_type '.mat'],'RoCs');
-%save(['evaluation_set/RoC_' feat_type '_overall.mat'],'Roc1');
+
+if all
+    save(['evaluation_set/RoC_' feat_type '_overall.mat'],'Roc1');
+else
+    save(['evaluation_set/RoC_' feat_type '.mat'],'RoCs');
+end
+
 %legend('tt1','tt2')

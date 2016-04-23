@@ -18,7 +18,7 @@ options.hex = 0;
 options.bin_size = 8;
 options.tracklet_len= 17;
 options.feat_type = 'coa_m';
-options.th = 0.3;
+options.th = 0;
 % W_measure_type = 'euc' , 'ham' , 'dec'
 options.W_measure_type = 'euc';
 options.binary_based = 0;
@@ -35,7 +35,7 @@ load('variables/bg_mask_ped2.mat');
 feat_dir = '../data/ucsd_conv5/UCSDped2/Test';
 img_folder = '../data/ucsd/UCSDped2/Test/Test001/';
 options.gt_folder='../data/ucsd/UCSDped2/gt/';
-options.segments_file=['../data/output/feats_conv5_th_' num2str(options.th) '_of_ovrs.mat'];
+options.segments_file=['../data/output/feats_conv5_th_' num2str(options.th) '_wxof_early_prouned.mat'];
 pres_rescore = ones(5,8);
 
 % optical flow setup
