@@ -35,12 +35,12 @@ for sample_no=1:size(feat_matrix,3)
     h_th = floor(size(feat_matrix,1)/size(bin_val_map,1));
     w_th = floor(size(feat_matrix,2)/size(bin_val_map,2));
     fusion = imresize(fusion,options.resize_vis);
-    for h_idx=1:size(bin_val_map,1)
-        for w_idx=1:size(bin_val_map,2)
-            position = [(w_idx-1)*w_th*options.resize_vis (h_idx-1)*h_th*options.resize_vis+30];
-            fusion = insertText(fusion,position,bin_val_map(h_idx,w_idx,sample_no),'AnchorPoint','LeftBottom');
-        end
-    end
+%     for h_idx=1:size(bin_val_map,1)
+%         for w_idx=1:size(bin_val_map,2)
+%             position = [(w_idx-1)*w_th*options.resize_vis (h_idx-1)*h_th*options.resize_vis+30];
+%             fusion = insertText(fusion,position,bin_val_map(h_idx,w_idx,sample_no),'AnchorPoint','LeftBottom');
+%         end
+%     end
     if options.save_frames
         save_dir = ['../data/output/frms/' options.name_ext ];
         if ~exist(save_dir,'dir')

@@ -31,13 +31,13 @@ load('variables/W_conv5_8bit_ped2');
 load('variables/itq_8_conv5_ped2');
 load('variables/bg_mask_ped2.mat');
 
-feat_dir = '../data/ucsd_conv5/UCSDped2/Test/Test007';
-img_folder = '../data/ucsd/UCSDped2/Test/Test007/';
+feat_dir = '../data/ucsd_conv5/UCSDped2/Test/Test002';
+img_folder = '../data/ucsd/UCSDped2/Test/Test002/';
 options.gt_folder='../data/ucsd/UCSDped2/gt/Test002_gt/';
 
 %options.segments_file='../data/output/motion_feats_conv5_ped2.mat';
 options.optical_flow='../data/output/motion_feats_OF_ped2.mat';
-options.fusion_with_OF =1;
+options.fusion_with_OF =0;
 load(options.optical_flow, 'all_OF_map');
 optical_flow = all_OF_map(7,:);
 
