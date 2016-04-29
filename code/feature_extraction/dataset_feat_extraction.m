@@ -16,21 +16,23 @@ d = 'model/imagenet_layer5.prototxt';
 caffe('init', d, n, 'test')
 caffe('set_mode_gpu');
 
-feat_type='ucsd_conv5_6x4';
+feat_type='umn_conv5';
 
 dataset_roots={'../../data/ucsd/UCSDped1/Train/', '../../data/ucsd/UCSDped1/Test/', ...
-    '../../data/ucsd/UCSDped2/Train/', '../../data/ucsd/UCSDped2/Test/'};
+    '../../data/ucsd/UCSDped2/Train/', '../../data/ucsd/UCSDped2/Test/', ...
+    '../../data/umn/'};
 save_feats_roots={['../../data/output/' feat_type '/UCSDped1/Train/'],...
     ['../../data/output/' feat_type '/UCSDped1/Test/'],...
     ['../../data/output/' feat_type '/UCSDped2/Train/'],...
-    ['../../data/output/' feat_type '/UCSDped2/Test/']};
+    ['../../data/output/' feat_type '/UCSDped2/Test/'],...
+    ['../../data/output/' feat_type '/']};
 
-for dt_idx=2:2%length(dataset_roots)
+for dt_idx=5:length(dataset_roots)
     
 dataset_root = dataset_roots{dt_idx};
 save_feats_root = save_feats_roots{dt_idx};
 
-video_names = dir([dataset_root 'T*']);
+video_names = dir([dataset_root 'f*']);
 num_videos = length(video_names);
 
 for video_idx=1:num_videos
@@ -41,7 +43,7 @@ if ~exist(video_feat_path_folder,'dir')
 end
 % Data
 dataset_path = [dataset_root video_names(video_idx).name];
-img_names = dir([dataset_path '/*.tif']);
+img_names = dir([dataset_path '/*.bmp']);
 
 num_image = length(img_names);
 % im_selected = img_ids(1:num_image);
